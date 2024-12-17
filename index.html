@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Song Downloader</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            width: 300px;
+            font-size: 1em;
+            margin-bottom: 20px;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        input[type="text"]:focus {
+            background-color: #2a2a2a;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            outline: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00bcd4;
+            color: #ffffff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        button:hover {
+            background-color: #0097a7;
+            transform: scale(1.05);
+        }
+
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        .loading {
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>YouTube Song Downloader 🎵</h1>
+    <label for="song">Enter Song Name:</label>
+    <input type="text" id="song" placeholder="e.g. River Flows in You">
+    <button id="download-btn" onclick="downloadSong()">Download</button>
+    <p id="status"></p>
+
+    <script>
+        function downloadSong() {
+            const songName = document.getElementById("song").value;
+            const status = document.getElementById("status");
+            const downloadBtn = document.getElementById("download-btn");
+
+            if (!songName) {
+                status.textContent = "Please enter a song name!";
+                return;
+            }
+
+            downloadBtn.disabled = true;
+            status.textContent = "Downloading... ⏳";
+            status.classList.add("loading");
+
+            fetch("http://127.0.0.1:5000/download", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ song: songName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                status.classList.remove("loading");
+                if (data.error) {
+                    status.textContent = "Error: " + data.error;
+                } else {
+                    status.textContent = "✅ Download Complete! Check your downloads folder.";
+                }
+            })
+            .catch(err => {
+                status.textContent = "Something went wrong! " + err.message;
+            })
+            .finally(() => {
+                downloadBtn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
