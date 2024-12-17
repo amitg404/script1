@@ -16,7 +16,7 @@ CORS(app)
 
 @app.route('/')
 def home():
-    return "Welcome to the YouTube Song Downloader API!"
+    return render_template('index.html')
 
 @app.route('/download', methods=['POST'])
 def download_song():
